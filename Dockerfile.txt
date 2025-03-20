@@ -1,0 +1,17 @@
+# Use OpenResty (Nginx + Lua)
+FROM openresty/openresty:latest
+
+# Remove default Nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy Nginx config
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+
+# Copy JWT Authentication Lua script
+COPY jwt/auth.lua /etc/nginx/auth.lua
+
+# Expose ports
+EXPOSE 80 443
+
+# Start Nginx
+CMD ["openresty", "-g", "daemon off;"]

@@ -1,0 +1,73 @@
+services:
+  api-gateway:
+    build: .
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - microservice1
+      - microservice2
+      - microservice3
+      - microservice4-1
+      - microservice4-2
+      - microservice5-1
+      - microservice5-2
+    networks:
+      - app-network
+
+  microservice1:
+    image: my_microservice1
+    container_name: microservice1
+    restart: always
+    networks:
+      - app-network
+
+  microservice2:
+    image: my_microservice2
+    container_name: microservice2
+    restart: always
+    networks:
+      - app-network
+
+  microservice3:
+    image: my_microservice3
+    container_name: microservice3
+    restart: always
+    networks:
+      - app-network
+
+  # Load Balanced Microservice 4
+  microservice4-1:
+    image: my_microservice4
+    container_name: microservice4-1
+    restart: always
+    networks:
+      - app-network
+
+  microservice4-2:
+    image: my_microservice4
+    container_name: microservice4-2
+    restart: always
+    networks:
+      - app-network
+
+  # Load Balanced Microservice 5
+  microservice5-1:
+    image: my_microservice5
+    container_name: microservice5-1
+    restart: always
+    networks:
+      - app-network
+
+  microservice5-2:
+    image: my_microservice5
+    container_name: microservice5-2
+    restart: always
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

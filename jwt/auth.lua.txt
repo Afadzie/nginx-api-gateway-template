@@ -1,0 +1,43 @@
+local jwt = require "resty.jwt"
+
+local secret = "my_super_secret_key"
+
+-- Function to validate JWT
+function validate_jwt()
+    local auth_header = ngx.var.http_Authorization
+    if not auth_header then
+        ngx.status = ngx.HTTP_UNAUTHORIZED
+        ngx.say("{\"error\": \"Missing Authorization Header\"}")
+        ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    end
+
+    -- Extract token
+    local token = auth_header:match("Bearer%s+(.+)")
+    if not token then
+        ngx.status = ngx.HTTP_UNAUTHORIZED
+        ngx.say("{\"error\": \"Invalid Authorization Header\"}")
+        ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    end
+
+    -- Decode JWT
+    local jwt_obj = jwt:verify(secret, token)
+    if not jwt_obj.verified then
+        ngx.status = ngx.HTTP_UNAUTHORIZED
+        ngx.say("{\"error\": \"Invalid Token\"}")
+        ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    end
+
+    -- Role-Based Authorization
+    local role = jwt_obj.payload.role
+    if ngx.var.uri:match("^/admin") and role ~= "admin" then
+        ngx.status = ngx.HTTP_FORBIDDEN
+        ngx.say("{\"error\": \"Forbidden: Admins Only\"}")
+        ngx.exit(ngx.HTTP_FORBIDDEN)
+    end
+
+    -- Allow request to proceed
+    ngx.var.user_role = role
+end
+
+-- Execute JWT validation
+validate_jwt()
