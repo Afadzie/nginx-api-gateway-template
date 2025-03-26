@@ -1,0 +1,22 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_gateway
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - mynetwork
+
+  microservice1:
+    image: zigma-auth-laravel
+    container_name: zigma-auth
+    ports:
+      - "8001:8001"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
